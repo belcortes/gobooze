@@ -1,0 +1,3 @@
+rootProject.name = 'GoBooze'
+
+include ':app'
