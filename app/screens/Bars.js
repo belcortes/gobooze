@@ -45,6 +45,7 @@ export default class Bars extends Component {
   render() {
     return (
       <View>
+        <Geolocation />
         <Carousel
           ref={(c) => { this._carousel = c; }}
           data={this.state.data}
