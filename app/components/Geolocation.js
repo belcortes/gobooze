@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, ActivityIndicator } from 'react-native';
 
 // import Bars from '../components/Bars';
+import Carousel from 'react-native-snap-carousel';
 
 class Geolocation extends Component {
   constructor(props) {
@@ -11,6 +12,7 @@ class Geolocation extends Component {
       latitude: null,
       longitude: null,
       error: null,
+      isLoading: false,
       barData: [],
     };
   }
@@ -22,25 +24,16 @@ class Geolocation extends Component {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           error: null,
+          isLoading: true
         }, function() { this.barsList(); });
       },
-      (error) => this.setState({ error: error.message }),
+      (error) => this.setState({ error: error.message, isLoading: false }),
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
     );
-    
-    // console.log('WE SHOULD BE GETTING A LATITUDE HURRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR')
-    // console.log(this.state.latitude)
-    // this.barsList();
-    // console.log('hello hello')
-    // console.log(this.state.barData)
-    // this.barsList(this.state.latitude, this.state.longitude);
   }
 
   barsList() {
-    // console.log('!!!!!!%%%%%%%%$$$$$$$$*******@@@@@@@@')
-    // console.log(this.state.latitude)
     const BASE_URL = `https://api.yelp.com/v3/businesses/search?term=bars&latitude=${this.state.latitude}&longitude=${this.state.longitude}&open_now=true`;
-    // console.log(BASE_URL)
     // const fetchData = () =>
     fetch(`${BASE_URL}`, {
       method: 'get', 
@@ -68,68 +61,60 @@ class Geolocation extends Component {
     // };
   }
 
-  render() {
-    // console.log(this.state.latitude)
-    // this.barsList(this.state.latitude, this.state.longitude);
-    // console.log('BAR STATE STARTS HURRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR')
-    // console.log(this.state.barData.businesses.last)
-    console.log('BAR STATE ENDS HURRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR')
+  _renderItem ({item, index}) {
     const bars = this.state.barData.businesses
-    // console.log(this.state.barData.total)
-    // console.log(this.state.barData === Array)
-    // if(bars != undefined) {
-    // const renderBar = bars.map((bar, i) => {
-    //   return <div>
-    //     <h1>{bar.name}</h1>
-    //   </div>
-    // });
-    // }
-    // var stringConstructor = "test".constructor;
-    // var arrayConstructor = [].constructor;
-    // var objectConstructor = {}.constructor;
-
-    // function whatIsIt(bars) {
-    //     if (bars === null) {
-    //         return "null";
-    //     }
-    //     else if (bars === undefined) {
-    //         return "undefined";
-    //     }
-    //     else if (bars.constructor === stringConstructor) {
-    //         return "String";
-    //     }
-    //     else if (bars.constructor === arrayConstructor) {
-    //         return "Array";
-    //     }
-    //     else if (bars.constructor === objectConstructor) {
-    //         return "Object";
-    //     }
-    //     else {
-    //         return "don't know";
-    //     }
-    // }
-    // console.log(whatIsIt(bars))
-
-    // for (var bar in bars) {
-    //   console.log(bars.length) 
-    // }
-    // const bars = this.state.barData.businesses.map((item, i) => {
-    //   return <div>
-    //     <h1>{item.name}</h1>
-    //   </div>
-    // });
-    // this.BarsList();
-    // for (var i = 0; i < arrayLength; i++) {
-    //     alert(myStringArray[i]);
-    // }
-    // console.log(renderBar)
+    const renderBar = bars.map((bar, i) => {
+        return (
+          <View style={styles.slide}>
+            <Text style={styles.title}>{ bar.name }</Text>
+            <Text style={styles.content}>{ bar.price }</Text>
+            <Text style={styles.content}>{ bar.location.display_address }</Text>
+            <Text style={styles.content}>{bar.display_phone}</Text>
+            <TouchableOpacity 
+              style={styles.buttonContainer} 
+              onPress={() => this.onLearnMore(bar)}>
+              <Text style={styles.buttonText}>PICK ME!</Text>
+            </TouchableOpacity>
+          </View>
+        )
+        // <Text>{bar.name}</Text>
+      });
 
     return (
-      <View>
-
-        <Text>Latitude: { this.state.latitude }</Text>
+      <View style={styles.slide}>
+        <Text style={styles.title}>{ item.name }</Text>
+        <Text style={styles.content}>{ item.price }</Text>
+        <Text style={styles.content}>{ item.location.display_address }</Text>
+        <Text style={styles.content}>{item.display_phone}</Text>
+        <TouchableOpacity 
+          style={styles.buttonContainer} 
+          onPress={() => this.onLearnMore(item)}>
+          <Text style={styles.buttonText}>PICK ME!</Text>
+        </TouchableOpacity>
       </View>
     );
+  }
+
+  render() {
+    const spinner = this.state.isLoading ? <ActivityIndicator size='large'/> : null
+    const bars = this.state.barData.businesses
+
+    
+    if (bars != undefined) {
+
+      const renderBar = bars.map((bar, i) => {
+        return <Text>{bar.name}</Text>
+      });
+
+      return (
+        <View>
+          <Text>{ renderBar }</Text>
+          <Text>Latitude: { this.state.latitude }</Text>
+        </View>
+      );
+    } else {
+      return <View>{spinner}</View>;
+    }
   }
 }
 

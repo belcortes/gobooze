@@ -7,13 +7,11 @@ import {
   Button,
   StyleSheet,
   TouchableOpacity,
-  Dimensions
+  Dimensions,
+  ActivityIndicator,
+  Image
 } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
-
-import { data } from '../config/yelp';
-import Geolocation from '../components/Geolocation';
-
 
 export default class Bars extends Component {
 
@@ -21,42 +19,88 @@ export default class Bars extends Component {
     this.props.navigation.navigate('BarDetails', { ...bar });
   };
 
-  state = {
-    data: data._55.businesses,
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      latitude: null,
+      longitude: null,
+      error: null,
+      isLoading: false,
+      barData: [],
+    };
+  }
+
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.setState({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          error: null,
+          isLoading: true
+        }, function() { this.barsList(); });
+      },
+      (error) => this.setState({ error: error.message, isLoading: false }),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
+    );
+  }
+
+  barsList() {
+    const BASE_URL = `https://api.yelp.com/v3/businesses/search?term=bars&latitude=${this.state.latitude}&longitude=${this.state.longitude}&open_now=true`;
+
+    fetch(`${BASE_URL}`, {
+      method: 'get', 
+      headers: {
+        'Authorization': 'Bearer eCO_zQz_Uu1BfMzvkfnsDFflR5xTwjx4Cd22vlATn4cQ3Grky8b11xs5fcYYL4m5QoK_CIj6XXRLUF-2V3nBlw5cjaFoJImgRzf8-iIqCWgMjcSk9UOxrP8uanabWXYx', 
+      }
+    })
+    .then((response) => response.json())
+    .then((responseJson) => { this.setState({ barData: responseJson })})
+    .catch((error) => {
+     console.error(error);
+    });
   }
 
   _renderItem ({item, index}) {
     return (
-      <View style={styles.slide}>
-        <Text style={styles.title}>{ item.name }</Text>
-        <Text style={styles.content}>{ item.price }</Text>
-        <Text style={styles.content}>{ item.location.display_address }</Text>
-        <Text style={styles.content}>{item.display_phone}</Text>
+      <Image source={{ uri: item.image_url }} style={styles.slide}>
+        <View style={styles.backdropView}>
+          <Text style={styles.title}>{ item.name }</Text>
+          <Text style={styles.content}>{ item.price }</Text>
+          <Text style={styles.content}>{ item.location.display_address }</Text>
+          <Text style={styles.content}>{item.display_phone}</Text>
+        </View>
         <TouchableOpacity 
           style={styles.buttonContainer} 
           onPress={() => this.onLearnMore(item)}>
           <Text style={styles.buttonText}>PICK ME!</Text>
         </TouchableOpacity>
-      </View>
+      </Image>
     );
   }
 
-
   render() {
-    return (
-      <View>
-        <Geolocation />
-        <Carousel
-          ref={(c) => { this._carousel = c; }}
-          data={this.state.data}
-          renderItem={this._renderItem.bind(this)}
-          sliderWidth={400}
-          itemWidth={300}
-          style={styles.carousel}
-        />
-      </View>
-      
-    )
+    const spinner = this.state.isLoading ? <ActivityIndicator size='large'/> : null
+    const bars = this.state.barData.businesses
+    // console.log(bars)
+    if (bars != undefined) {
+      return (
+        <View>
+          <Carousel
+            ref={(c) => { this._carousel = c; }}
+            data={bars}
+            renderItem={this._renderItem.bind(this)}
+            sliderWidth={400}
+            itemWidth={300}
+            style={styles.carousel}
+          />
+        </View>
+      )
+    } else {
+      return <View>{spinner}</View>;
+    }
+    
   }
 }
 
@@ -67,27 +111,32 @@ const styles = StyleSheet.create({
     marginTop: 50,
     width: 300,
     height: 500,
-    backgroundColor: '#FF0000',
+    justifyContent: 'center',
+  },
+  backdropView: {
+    backgroundColor: 'rgba(255,255,255,0.5)',
   },
   carousel: {
     backgroundColor: '#320CE8'
   },
   title: {
     textAlign: 'center',
-    color: 'white',
+    color: 'black',
     fontSize: 20,
     paddingVertical: 20,
   },
   content: {
     textAlign: 'center',
     fontSize: 16,
-    paddingVertical: 15
+    paddingVertical: 15,
+    color: 'black'
   },
   buttonContainer: {
     backgroundColor: '#F5F5F5',
     paddingVertical: 15,
-    marginBottom: 20,
-    width: '80%',
+    marginTop: 50,
+    width: '60%',
+    marginLeft: '20%'
   },
   buttonText: {
     textAlign: 'center',
