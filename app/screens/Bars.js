@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ActivityIndicator,
-  Image
+  ImageBackground
 } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
 
@@ -64,11 +64,12 @@ export default class Bars extends Component {
 
   _renderItem ({item, index}) {
     return (
-      <Image source={{ uri: item.image_url }} style={styles.slide}>
+      <ImageBackground source={{ uri: item.image_url }} style={styles.slide}>
         <View style={styles.backdropView}>
           <Text style={styles.title}>{ item.name }</Text>
           <Text style={styles.content}>{ item.price }</Text>
-          <Text style={styles.content}>{ item.location.display_address }</Text>
+          <Text style={styles.content}>{ item.location.address1 }</Text>
+          <Text style={styles.content}>{ item.location.city }</Text>
           <Text style={styles.content}>{item.display_phone}</Text>
         </View>
         <TouchableOpacity 
@@ -76,7 +77,7 @@ export default class Bars extends Component {
           onPress={() => this.onLearnMore(item)}>
           <Text style={styles.buttonText}>PICK ME!</Text>
         </TouchableOpacity>
-      </Image>
+      </ImageBackground>
     );
   }
 
@@ -84,6 +85,8 @@ export default class Bars extends Component {
     const spinner = this.state.isLoading ? <ActivityIndicator size='large'/> : null
     const bars = this.state.barData.businesses
     // console.log(bars)
+    console.log('HUTRRRRRRRRRR')
+    console.log(this.props.navigation.state.params.screenName);
     if (bars != undefined) {
       return (
         <View>
@@ -114,7 +117,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   backdropView: {
-    backgroundColor: 'rgba(255,255,255,0.5)',
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    width: '80%',
+    marginLeft: '10%',
+    paddingHorizontal: 20,
   },
   carousel: {
     backgroundColor: '#320CE8'
@@ -135,8 +141,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     paddingVertical: 15,
     marginTop: 50,
-    width: '60%',
-    marginLeft: '20%'
+    width: '80%',
+    marginLeft: '10%'
   },
   buttonText: {
     textAlign: 'center',
