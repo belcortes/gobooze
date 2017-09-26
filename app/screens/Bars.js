@@ -47,9 +47,24 @@ export default class Bars extends Component {
   }
 
   barsList() {
-    const BASE_URL = `https://api.yelp.com/v3/businesses/search?term=bars&latitude=${this.state.latitude}&longitude=${this.state.longitude}&open_now=true`;
+    const BASE_URL = `https://api.yelp.com/v3/businesses/search?term=bars&latitude=${this.state.latitude}&longitude=${this.state.longitude}&open_now=true&radius=1800`;
+    let urlParams = '';
+    switch(this.props.navigation.state.params.screenName){
+      case 'Happy Hour':
+        urlParams='&attributes=hh'
+        break;
+      case 'Distance':
+        urlParams='&sort_by=distance'
+        break;
+      case 'Ratings':
+        urlParams = '&sort_by=rating'
+        break;
+      case 'Price':
+        urlParams = '&price=1'
+        break;
+    };
 
-    fetch(`${BASE_URL}`, {
+    fetch(`${BASE_URL}${urlParams}`, {
       method: 'get', 
       headers: {
         'Authorization': 'Bearer eCO_zQz_Uu1BfMzvkfnsDFflR5xTwjx4Cd22vlATn4cQ3Grky8b11xs5fcYYL4m5QoK_CIj6XXRLUF-2V3nBlw5cjaFoJImgRzf8-iIqCWgMjcSk9UOxrP8uanabWXYx', 
@@ -68,6 +83,7 @@ export default class Bars extends Component {
         <View style={styles.backdropView}>
           <Text style={styles.title}>{ item.name }</Text>
           <Text style={styles.content}>{ item.price }</Text>
+          <Text style={styles.content}>{ item.rating }</Text>
           <Text style={styles.content}>{ item.location.address1 }</Text>
           <Text style={styles.content}>{ item.location.city }</Text>
           <Text style={styles.content}>{item.display_phone}</Text>
@@ -82,14 +98,12 @@ export default class Bars extends Component {
   }
 
   render() {
-    const spinner = this.state.isLoading ? <ActivityIndicator size='large'/> : null
+    const spinner = this.state.isLoading ? <ActivityIndicator size='large' style={styles.centering}/> : null
     const bars = this.state.barData.businesses
-    // console.log(bars)
-    console.log('HUTRRRRRRRRRR')
-    console.log(this.props.navigation.state.params.screenName);
+    
     if (bars != undefined) {
       return (
-        <View>
+        <View style={styles.container}>
           <Carousel
             ref={(c) => { this._carousel = c; }}
             data={bars}
@@ -101,7 +115,7 @@ export default class Bars extends Component {
         </View>
       )
     } else {
-      return <View>{spinner}</View>;
+      return <View style={styles.container}>{spinner}</View>;
     }
     
   }
@@ -110,10 +124,20 @@ export default class Bars extends Component {
 var width = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'black',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   slide: {
     marginTop: 50,
     width: 300,
     height: 500,
+    justifyContent: 'center',
+  },
+  centering: {
+    alignItems: 'center',
     justifyContent: 'center',
   },
   backdropView: {
@@ -134,7 +158,7 @@ const styles = StyleSheet.create({
   content: {
     textAlign: 'center',
     fontSize: 16,
-    paddingVertical: 15,
+    paddingVertical: 10,
     color: 'black'
   },
   buttonContainer: {

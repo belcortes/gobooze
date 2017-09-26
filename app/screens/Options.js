@@ -9,33 +9,10 @@ import {
 
 
 export default class Options extends Component {
-	// constructor(props) {
- //    super(props);
-
- //    this.state = {
- //      latitude: null,
- //      longitude: null,
- //      error: null,
- //    };
- //  }
 
 	onLearnMore = (screenName) => {
     this.props.navigation.navigate('Bars', { screenName: screenName });
   };
-
-  // componentDidMount() {
-  //   navigator.geolocation.getCurrentPosition(
-  //     (position) => {
-  //       this.setState({
-  //         latitude: position.coords.latitude,
-  //         longitude: position.coords.longitude,
-  //         error: null,
-  //       });
-  //     },
-  //     (error) => this.setState({ error: error.message }),
-  //     { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
-  //   );
-  // }
 
   render() {
     return (
@@ -78,7 +55,8 @@ export default class Options extends Component {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		padding: 20
+		padding: 20,
+		backgroundColor: 'black'
 	},
 	logo: {
 		height: 50
@@ -86,18 +64,16 @@ const styles = StyleSheet.create({
 	logoContainer: {
 		alignItems: 'center',
 		marginTop: 50
-		// flexGrow: 1,
-		// justifyContent: 'center'
 	},
 	textContainer: {
 		marginTop: 50,
 		alignItems: 'center',
-		marginBottom: 50
+		marginBottom: 50,
 	},
 	textStyle: {
 		marginBottom: 10,
 		fontSize: 18,
-		color: '#383838'
+		color: 'white'
 	},
 	buttonContainer: {
 		backgroundColor: '#F5F5F5',
