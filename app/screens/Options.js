@@ -11,7 +11,8 @@ import {
 export default class Options extends Component {
 
 	onLearnMore = (screenName) => {
-    this.props.navigation.navigate('Bars', { screenName: screenName });
+    // this.props.navigation.navigate('Bars', { screenName: screenName });
+    this.props.navigation.navigate(screenName, { screenName: screenName });
   };
 
   render() {
@@ -29,7 +30,7 @@ export default class Options extends Component {
 
 				<TouchableOpacity 
 					style={styles.buttonContainer} 
-					onPress={() => this.onLearnMore('Happy Hour')}>
+					onPress={() => this.onLearnMore('HappyHour')}>
 					<Text style={styles.buttonText}>HAPPY HOUR</Text>
 				</TouchableOpacity>
 				<TouchableOpacity 

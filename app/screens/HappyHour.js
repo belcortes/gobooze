@@ -14,7 +14,7 @@ import {
 import Carousel from 'react-native-snap-carousel';
 import Stars from 'react-native-stars';
 
-export default class Bars extends Component {
+export default class HappyHour extends Component {
 
   onLearnMore = (bar) => {
     this.props.navigation.navigate('BarDetails', { ...bar });
@@ -48,22 +48,8 @@ export default class Bars extends Component {
   }
 
   barsList() {
-    const BASE_URL = `https://api.yelp.com/v3/businesses/search?term=bars&latitude=${this.state.latitude}&longitude=${this.state.longitude}&open_now=true&radius=1800`;
-    let urlParams = '';
-    switch(this.props.navigation.state.params.screenName){
-      case 'Happy Hour':
-        urlParams='&attributes=hh'
-        break;
-      case 'Distance':
-        urlParams='&sort_by=distance'
-        break;
-      case 'Ratings':
-        urlParams = '&sort_by=rating'
-        break;
-      case 'Price':
-        urlParams = '&price=1'
-        break;
-    };
+    const BASE_URL = `https://api.yelp.com/v3/businesses/search?term=bars&latitude=${this.state.latitude}&longitude=${this.state.longitude}&open_now=true`;
+    let urlParams = '&attributes=deals';
 
     fetch(`${BASE_URL}${urlParams}`, {
       method: 'get', 
@@ -78,26 +64,19 @@ export default class Bars extends Component {
     });
   }
 
+  getMiles(i) {
+    let num = i*0.000621371192
+    return Math.round(num * 100) / 100;
+  }
+
   _renderItem ({item, index}) {
     return (
       <ImageBackground source={{ uri: item.image_url }} style={styles.slide}>
         <View style={styles.backdropView}>
           <Text style={styles.title}>{ item.name }</Text>
-          <Text style={styles.content}>{ item.price }</Text>
-           <Stars
-              value={item.rating}
-              half={true}
-              spacing={8}
-              count={5}
-              starSize={20}
-              opacity={true}
-              backingColor='transparent'
-              fullStar= {require('../images/starFilled.png')}
-              emptyStar= {require('../images/starEmpty.png')}
-              halfStar={require('../images/starHalf.png')}/>
-          <Text style={styles.content}>{ item.location.address1 }</Text>
-          <Text style={styles.content}>{ item.location.city }</Text>
-          <Text style={styles.content}>{item.display_phone}</Text>
+          <Text style={styles.content}>HAPPY HOUR HERE</Text>
+          <Text style={styles.content}>{ item.location.address1 }{"\n"}{ item.location.city }</Text>
+          <Text style={styles.contentLast}>{ item.display_phone }</Text>
         </View>
         <TouchableOpacity 
           style={styles.buttonContainer} 
@@ -111,7 +90,7 @@ export default class Bars extends Component {
   render() {
     const spinner = this.state.isLoading ? <ActivityIndicator size='large' style={styles.centering}/> : null
     const bars = this.state.barData.businesses
-    
+    console.log(bars)
     if (bars != undefined) {
       return (
         <View style={styles.container}>
@@ -170,6 +149,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     paddingVertical: 10,
+    color: 'black'
+  },
+  contentLast: {
+    textAlign: 'center',
+    fontSize: 16,
+    paddingTop: 10,
+    paddingBottom: 20,
     color: 'black'
   },
   buttonContainer: {
